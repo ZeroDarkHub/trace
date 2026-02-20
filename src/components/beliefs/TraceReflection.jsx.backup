@@ -1,0 +1,280 @@
+import React, { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Sparkles, Loader2, RefreshCw } from 'lucide-react';
+
+export default function TraceReflection({ belief, onSave }) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [reflection, setReflection] = useState(null);
+  const [error, setError] = useState(null);
+
+  // Debug: Check belief object structure
+  console.log('Belief object:', belief);
+  console.log('Belief.content:', belief?.content);
+  console.log('Belief keys:', belief ? Object.keys(belief) : 'belief is null/undefined');
+  
+  const generateReflection = async () => {
+    setIsLoading(true);
+    setError(null);
+    
+    // Get the belief content - try multiple possible property names
+    const beliefContent = belief?.statement || belief?.content || belief?.text || belief?.thought || belief?.message || belief?.description || 'No belief content provided';
+    
+    console.log('Final beliefContent:', beliefContent);
+    console.log('beliefContent type:', typeof beliefContent);
+    console.log('beliefContent length:', beliefContent?.length);
+    
+    if (!beliefContent || beliefContent === 'undefined' || beliefContent === 'No belief content provided') {
+      setError('No belief content found. Please make sure the belief has content.');
+      setIsLoading(false);
+      return;
+    }
+    
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      
+      const response = await fetch('https://api.together.xyz/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.REACT_APP_TOGETHER_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo',
+          temperature: 0.7,
+          messages: [{
+            role: 'user',
+            content: `Please provide a brief, gentle reflection that:
+1. Summarizes their belief in neutral language (1-2 sentences)
+2. Asks 1-2 clarifying questions that might help them think deeper
+3. Gently highlights any assumptions you notice (if any)
+
+Keep your tone warm, curious, and non-judgmental. Be concise — this is for mobile reading. Do not try to change their mind or offer your own opinion.
+
+Belief: ${beliefContent}`
+          }]
+        }),
+      });
+      
+      console.log('Ollama response:', response);
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log('Together AI response:', data);
+      const reflectionContent = data.choices?.[0]?.message?.content || "Reflection unavailable";
+      console.log('Reflection content:', reflectionContent);
+      setReflection(reflectionContent);
+
+    } catch (err) {
+      if (err.name === "AbortError") {
+        setError("Request timed out. Please try again.");
+      } else {
+        console.error(err);
+        setError("Couldn't generate reflection. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!reflection) return;
+    
+    const newAiReflection = {
+      date: new Date().toISOString(),
+      content: JSON.stringify(reflection)
+    };
+    
+    const existingReflections = belief.ai_reflections || [];
+    await onSave({
+      ai_reflections: [...existingReflections, newAiReflection]
+    });
+  };
+
+  if (!reflection && !isLoading) {
+    return (
+      <div className="bg-gradient-to-br from-[#E8EDE9] to-[#f0f4f1] rounded-2xl p-6">
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-xl bg-white/80 flex items-center justify-center flex-shrink-0">
+            <Sparkles className="w-5 h-5 text-[#5C6B5E]" />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-medium text-slate-800 mb-1">
+              Trace Reflection
+            </h3>
+            <p className="text-sm text-slate-600 mb-4">
+              Get a gentle reflection to help clarify your thinking. Trace won't judge or try to change your mind.
+            </p>
+            <Button
+              onClick={generateReflection}
+              disabled={isLoading}
+              className="bg-white hover:bg-slate-50 text-[#5C6B5E] border border-[#5C6B5E]/20 rounded-xl"
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              Reflect with Trace
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (reflection) {
+    return (
+      <>
+        {/* Current Reflection Box */}
+        <div className="bg-gradient-to-br from-[#E8EDE9] to-[#f0f4f1] rounded-2xl p-6 space-y-4 mb-6">
+          <div className="flex items-center gap-2">
+            <div className="w-10 h-10 rounded-xl bg-white/80 flex items-center justify-center flex-shrink-0">
+              <Sparkles className="w-5 h-5 text-[#5C6B5E]" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-medium text-slate-800 mb-1">
+                <span className="text-sm font-medium text-[#5C6B5E]">AI Reflection</span>
+              </h3>
+              <div className="prose prose-slate max-w-none">
+                <p>{reflection}</p>
+              </div>
+              
+              <div className="flex gap-2 pt-2">
+                <Button
+                  onClick={generateReflection}
+                  variant="outline"
+                  size="sm"
+                  className="text-slate-600 border-slate-200 rounded-lg"
+                >
+                  <RefreshCw className="w-4 h-4 mr-1" />
+                  New reflection
+                </Button>
+                <Button
+                  onClick={handleSave}
+                  size="sm"
+                  className="bg-[#5C6B5E] hover:bg-[#4a574c] text-white rounded-lg"
+                >
+                  Save this
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Past Reflections Section */}
+        {belief.ai_reflections && belief.ai_reflections.length > 0 && (
+          <div className="bg-white rounded-2xl p-6 border border-slate-200">
+            <h3 className="text-lg font-medium text-slate-800 mb-4 flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-[#5C6B5E]" />
+              Past Reflections
+            </h3>
+            <div className="space-y-3">
+              {belief.ai_reflections.map((ref, i) => (
+                <div key={i} className="p-4 bg-slate-50 rounded-xl text-sm">
+                  <p className="text-xs text-slate-400 mb-2">
+                    {new Date(ref.date).toLocaleDateString()}
+                  </p>
+                  <p className="text-slate-700 leading-relaxed">
+                    {JSON.parse(ref.content)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </>
+    );
+  }
+
+  // Past Reflections Section (show if there are saved reflections but no current reflection)
+  if (belief.ai_reflections && belief.ai_reflections.length > 0) {
+    return (
+      <div className="bg-white rounded-2xl p-6 border border-slate-200">
+        <h3 className="text-lg font-medium text-slate-800 mb-4 flex items-center gap-2">
+          <Sparkles className="w-5 h-5 text-[#5C6B5E]" />
+          Past Reflections
+        </h3>
+        <div className="space-y-3">
+          {belief.ai_reflections.map((ref, i) => (
+            <div key={i} className="p-4 bg-slate-50 rounded-xl text-sm">
+              <p className="text-xs text-slate-400 mb-2">
+                {new Date(ref.date).toLocaleDateString()}
+              </p>
+              <p className="text-slate-700 leading-relaxed">
+                {JSON.parse(ref.content)}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Current Reflection Box (no past reflections)
+  return (
+    <div className="bg-gradient-to-br from-[#E8EDE9] to-[#f0f4f1] rounded-2xl p-6 space-y-4">
+      <div className="flex items-center gap-2">
+        <div className="w-10 h-10 rounded-xl bg-white/80 flex items-center justify-center flex-shrink-0">
+          <Sparkles className="w-5 h-5 text-[#5C6B5E]" />
+        </div>
+        <div className="flex-1">
+          <h3 className="font-medium text-slate-800 mb-1">
+            <span className="text-sm font-medium text-[#5C6B5E]">AI Reflection</span>
+          </h3>
+          <div className="prose prose-slate max-w-none">
+            <p>{reflection}</p>
+          </div>
+          
+          <div className="flex gap-2 pt-2">
+            <Button
+              onClick={generateReflection}
+              variant="outline"
+              size="sm"
+              className="text-slate-600 border-slate-200 rounded-lg"
+            >
+              <RefreshCw className="w-4 h-4 mr-1" />
+              New reflection
+            </Button>
+            <Button
+              onClick={handleSave}
+              size="sm"
+              className="bg-[#5C6B5E] hover:bg-[#4a574c] text-white rounded-lg"
+            >
+              Save this
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="bg-gradient-to-br from-[#E8EDE9] to-[#f0f4f1] rounded-2xl p-6">
+        <div className="flex items-center justify-center gap-3 py-8">
+          <Loader2 className="w-5 h-5 animate-spin text-[#5C6B5E]" />
+          <span className="text-slate-600">Thinking gently...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 rounded-2xl p-6">
+        <p className="text-red-600 text-sm mb-3">{error}</p>
+        <Button
+          onClick={generateReflection}
+          variant="outline"
+          size="sm"
+          className="text-red-600 border-red-200"
+        >
+          <RefreshCw className="w-4 h-4 mr-2" />
+          Try again
+        </Button>
+      </div>
+    );
+  }
+}

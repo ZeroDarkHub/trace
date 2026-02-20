@@ -1,0 +1,75 @@
+{
+  "name": "Belief",
+  "type": "object",
+  "properties": {
+    "statement": {
+      "type": "string",
+      "description": "The belief statement - I believe that..."
+    },
+    "reasoning": {
+      "type": "string",
+      "description": "Why I believe this"
+    },
+    "evidence": {
+      "type": "string",
+      "description": "Evidence or experiences that support this belief"
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 10,
+      "description": "Confidence level from 1-10"
+    },
+    "what_would_change": {
+      "type": "string",
+      "description": "What would change my mind about this"
+    },
+    "reflections": {
+      "type": "array",
+      "description": "History of reflections and updates",
+      "items": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "note": {
+            "type": "string"
+          },
+          "confidence_then": {
+            "type": "number"
+          },
+          "still_believe": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "ai_reflections": {
+      "type": "array",
+      "description": "AI-generated reflections",
+      "items": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "content": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "is_archived": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the belief has been archived (no longer held)"
+    }
+  },
+  "required": [
+    "statement",
+    "confidence"
+  ]
+}
