@@ -288,9 +288,9 @@ export default function BeliefDetail() {
         {/* Clarity */}
         <div className={cn(
           "inline-flex items-center gap-2 px-4 py-2 rounded-full",
-          getClarityColor(belief.clarity)
+          getClarityColor(belief.clarity || belief.confidence)
         )}>
-          <span className="text-lg font-semibold">{belief.clarity}/10</span>
+          <span className="text-lg font-semibold">{belief.clarity || belief.confidence}/10</span>
           <span className="text-sm">clarity</span>
         </div>
 
@@ -341,7 +341,7 @@ export default function BeliefDetail() {
                     </Badge>
                   </div>
                   <p className="text-sm text-slate-600 mb-2">
-                    Clarity: {ref.clarity_then}/10
+                    Clarity: {ref.clarity_then || ref.confidence_then}/10
                   </p>
                   {ref.note && (
                     <p className="text-slate-700 text-sm">{ref.note}</p>

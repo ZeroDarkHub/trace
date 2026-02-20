@@ -70,7 +70,7 @@ export default function ExportModal({ isOpen, onClose, beliefs }) {
           day: 'numeric' 
         });
         let metadata = `Created ${createdDate}`;
-        if (belief.clarity) metadata += ` • Clarity ${belief.clarity}/10`;
+        if (belief.clarity || belief.confidence) metadata += ` • Clarity ${belief.clarity || belief.confidence}/10`;
         pdf.text(metadata, 20, yPosition);
         yPosition += 8;
         
@@ -129,7 +129,7 @@ export default function ExportModal({ isOpen, onClose, beliefs }) {
               day: 'numeric' 
             });
             let refText = refDate;
-            if (reflection.clarity_then) refText += ` • Clarity ${reflection.clarity_then}/10`;
+            if (reflection.clarity_then || reflection.confidence_then) refText += ` • Clarity ${reflection.clarity_then || reflection.confidence_then}/10`;
             if (reflection.still_believe) refText += ` • Working on it`;
             else refText += ` • Postponed`;
             

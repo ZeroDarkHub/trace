@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 export default function RevisitPrompt({ belief, onSave, onCancel }) {
   const [workingOnIt, setWorkingOnIt] = useState(null);
-  const [newClarity, setNewClarity] = useState(belief.clarity);
+  const [newClarity, setNewClarity] = useState(belief.clarity || belief.confidence);
   const [reflectionNote, setReflectionNote] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 

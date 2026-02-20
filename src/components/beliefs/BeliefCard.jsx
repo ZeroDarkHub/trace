@@ -32,10 +32,10 @@ export default function BeliefCard({ belief, onClick }) {
         {/* Clarity indicator */}
         <div className={cn(
           "flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center",
-          getClarityBg(belief.clarity)
+          getClarityBg(belief.clarity || belief.confidence)
         )}>
           <span className="text-lg font-semibold text-slate-700">
-            {belief.clarity}
+            {belief.clarity || belief.confidence}
           </span>
         </div>
 
@@ -66,8 +66,8 @@ export default function BeliefCard({ belief, onClick }) {
       {/* Clarity bar */}
       <div className="mt-4 h-1 bg-slate-100 rounded-full overflow-hidden">
         <div 
-          className={cn("h-full rounded-full transition-all", getClarityColor(belief.clarity))}
-          style={{ width: `${belief.clarity * 10}%` }}
+          className={cn("h-full rounded-full transition-all", getClarityColor(belief.clarity || belief.confidence))}
+          style={{ width: `${(belief.clarity || belief.confidence) * 10}%` }}
         />
       </div>
     </button>
