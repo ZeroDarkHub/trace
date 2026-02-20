@@ -235,32 +235,43 @@ export default function BeliefDetail() {
 
         {/* Main belief */}
         <div>
-          {/* Motivational message for many postponed reflections */}
-          {belief.reflections?.filter(ref => !ref.still_working).length >= 3 && (
-            <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-amber-200 p-4 mb-6 rounded-xl">
-              <div className="flex items-start gap-3">
-                <Lightbulb className="w-5 h-5 text-amber-600 mt-1" />
-                <div>
-                  <p className="text-sm text-amber-800 font-medium leading-relaxed">
-                    {getRandomMotivationalMessage()}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Motivational message for consistent work */}
-          {belief.reflections?.filter(ref => ref.still_working).length >= 3 && (
-            <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border-l-4 border-emerald-200 p-4 mb-6 rounded-xl">
-              <div className="flex items-start gap-3">
-                <TrendingUp className="w-5 h-5 text-emerald-600 mt-1" />
-                <div>
-                  <p className="text-sm text-emerald-800 font-medium leading-relaxed">
-                    {getConsistentWorkMessage()}
-                  </p>
-                </div>
-              </div>
-            </div>
+          {/* Motivational message based on current status */}
+          {belief.reflections?.length >= 3 && (
+            (() => {
+              const mostRecent = belief.reflections[belief.reflections.length - 1];
+              const isCurrentlyPostponed = !mostRecent.still_working;
+              const postponedCount = belief.reflections.filter(ref => !ref.still_working).length;
+              const consistentCount = belief.reflections.filter(ref => ref.still_working).length;
+              
+              if (isCurrentlyPostponed && postponedCount >= 3) {
+                return (
+                  <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-amber-200 p-4 mb-6 rounded-xl">
+                    <div className="flex items-start gap-3">
+                      <Lightbulb className="w-5 h-5 text-amber-600 mt-1" />
+                      <div>
+                        <p className="text-sm text-amber-800 font-medium leading-relaxed">
+                          {getRandomMotivationalMessage()}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              } else if (!isCurrentlyPostponed && consistentCount >= 3) {
+                return (
+                  <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border-l-4 border-emerald-200 p-4 mb-6 rounded-xl">
+                    <div className="flex items-start gap-3">
+                      <TrendingUp className="w-5 h-5 text-emerald-600 mt-1" />
+                      <div>
+                        <p className="text-sm text-emerald-800 font-medium leading-relaxed">
+                          {getConsistentWorkMessage()}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            })()
           )}
           
           <div className="flex items-center gap-2 text-sm text-slate-400 mb-3">
