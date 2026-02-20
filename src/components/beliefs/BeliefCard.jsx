@@ -4,18 +4,18 @@ import { ChevronRight, Archive } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
 export default function BeliefCard({ belief, onClick }) {
-  const getConfidenceColor = (val) => {
+  const getClarityColor = (val) => {
     if (val <= 3) return "bg-amber-400";
     if (val <= 5) return "bg-slate-300";
     if (val <= 7) return "bg-emerald-300";
     return "bg-emerald-500";
   };
 
-  const getConfidenceBg = (val) => {
+  const getClarityBg = (val) => {
     if (val <= 3) return "bg-amber-50";
     if (val <= 5) return "bg-slate-50";
     if (val <= 7) return "bg-emerald-50";
-    return "bg-emerald-50";
+    return "bg-emerald-100";
   };
 
   return (
@@ -29,13 +29,13 @@ export default function BeliefCard({ belief, onClick }) {
       )}
     >
       <div className="flex items-start gap-4">
-        {/* Confidence indicator */}
+        {/* Clarity indicator */}
         <div className={cn(
           "flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center",
-          getConfidenceBg(belief.confidence)
+          getClarityBg(belief.clarity)
         )}>
           <span className="text-lg font-semibold text-slate-700">
-            {belief.confidence}
+            {belief.clarity}
           </span>
         </div>
 
@@ -63,11 +63,11 @@ export default function BeliefCard({ belief, onClick }) {
         <ChevronRight className="flex-shrink-0 w-5 h-5 text-slate-300 mt-3" />
       </div>
 
-      {/* Confidence bar */}
+      {/* Clarity bar */}
       <div className="mt-4 h-1 bg-slate-100 rounded-full overflow-hidden">
         <div 
-          className={cn("h-full rounded-full transition-all", getConfidenceColor(belief.confidence))}
-          style={{ width: `${belief.confidence * 10}%` }}
+          className={cn("h-full rounded-full transition-all", getClarityColor(belief.clarity))}
+          style={{ width: `${belief.clarity * 10}%` }}
         />
       </div>
     </button>

@@ -14,11 +14,11 @@
       "type": "string",
       "description": "Evidence or experiences that support this belief"
     },
-    "confidence": {
+    "clarity": {
       "type": "number",
       "minimum": 1,
       "maximum": 10,
-      "description": "Confidence level from 1-10"
+      "description": "Clarity level from 1-10"
     },
     "what_would_change": {
       "type": "string",
@@ -37,7 +37,7 @@
           "note": {
             "type": "string"
           },
-          "confidence_then": {
+          "clarity_then": {
             "type": "number"
           },
           "still_believe": {
@@ -70,6 +70,6 @@
   },
   "required": [
     "statement",
-    "confidence"
+    "clarity"
   ]
 }

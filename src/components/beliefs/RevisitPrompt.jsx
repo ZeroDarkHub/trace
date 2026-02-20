@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Check, X, Loader2 } from 'lucide-react';
-import ConfidenceSlider from './ConfidenceSlider';
+import ClaritySlider from './ClaritySlider';
 import { cn } from "@/lib/utils";
 
 export default function RevisitPrompt({ belief, onSave, onCancel }) {
   const [workingOnIt, setWorkingOnIt] = useState(null);
-  const [newConfidence, setNewConfidence] = useState(belief.confidence);
+  const [newClarity, setNewClarity] = useState(belief.clarity);
   const [reflectionNote, setReflectionNote] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -17,14 +17,14 @@ export default function RevisitPrompt({ belief, onSave, onCancel }) {
     const newReflection = {
       date: new Date().toISOString(),
       note: reflectionNote,
-      confidence_then: newConfidence,
+      clarity_then: newClarity,
       still_working: workingOnIt
     };
 
     const existingReflections = belief.reflections || [];
     
     await onSave({
-      confidence: newConfidence,
+      clarity: newClarity,
       is_archived: workingOnIt === false,
       reflections: [...existingReflections, newReflection]
     });
@@ -76,19 +76,19 @@ export default function RevisitPrompt({ belief, onSave, onCancel }) {
         </div>
       </div>
 
-      {/* Confidence update */}
+      {/* Clarity update */}
       {workingOnIt !== null && (
         <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
           <p className="text-slate-700 font-medium">
             {workingOnIt 
-              ? "Has your clarity changed?" 
-              : "How do you feel now?"
+              ? "How clear are you about this idea now?"
+              : "Before postponing, how clear were you about this idea?"
             }
           </p>
           <div className="p-4 bg-slate-50 rounded-xl">
-            <ConfidenceSlider
-              value={newConfidence}
-              onChange={setNewConfidence}
+            <ClaritySlider
+              value={newClarity}
+              onChange={setNewClarity}
               compact
             />
           </div>

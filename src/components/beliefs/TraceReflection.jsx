@@ -203,7 +203,7 @@ EVIDENCE:
 "${belief.evidence || 'Not specified'}"
 
 CLARITY:
-${belief.confidence || 'Not specified'}/10
+${belief.clarity || 'Not specified'}/10
 
 === TASK ===
 

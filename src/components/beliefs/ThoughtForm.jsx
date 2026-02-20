@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Loader2, Sparkles } from 'lucide-react';
-import ConfidenceSlider from './ConfidenceSlider';
+import ClaritySlider from './ClaritySlider';
 import { cn } from "@/lib/utils";
 
 export default function ThoughtForm({ initialData, onSubmit, onCancel, isLoading }) {
@@ -10,7 +10,7 @@ export default function ThoughtForm({ initialData, onSubmit, onCancel, isLoading
     statement: initialData?.statement || '',
     reasoning: initialData?.reasoning || '',
     evidence: initialData?.evidence || '',
-    confidence: initialData?.confidence || 5,
+    clarity: initialData?.clarity || 5,
     what_would_change: initialData?.what_would_change || '',
   });
 
@@ -51,11 +51,11 @@ export default function ThoughtForm({ initialData, onSubmit, onCancel, isLoading
         />
       </div>
 
-      {/* Confidence */}
+      {/* Clarity */}
       <div className="py-2">
-        <ConfidenceSlider
-          value={formData.confidence}
-          onChange={(val) => updateField('confidence', val)}
+        <ClaritySlider
+          value={formData.clarity}
+          onChange={(val) => updateField('clarity', val)}
         />
       </div>
 

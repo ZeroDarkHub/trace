@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import ConfidenceSlider from '@/components/beliefs/ConfidenceSlider';
+import ClaritySlider from '@/components/beliefs/ClaritySlider';
 import TraceReflection from '@/components/beliefs/TraceReflection';
 import RevisitPrompt from '@/components/beliefs/RevisitPrompt';
 import { cn } from "@/lib/utils";
@@ -150,7 +150,7 @@ export default function BeliefDetail() {
 
   console.log('Rendering belief:', belief);
 
-  const getConfidenceColor = (val) => {
+  const getClarityColor = (val) => {
     if (val <= 3) return "text-amber-600 bg-amber-50";
     if (val <= 5) return "text-slate-600 bg-slate-50";
     if (val <= 7) return "text-emerald-600 bg-emerald-50";
@@ -285,13 +285,13 @@ export default function BeliefDetail() {
           </h1>
         </div>
 
-        {/* Confidence */}
+        {/* Clarity */}
         <div className={cn(
           "inline-flex items-center gap-2 px-4 py-2 rounded-full",
-          getConfidenceColor(belief.confidence)
+          getClarityColor(belief.clarity)
         )}>
-          <span className="text-lg font-semibold">{belief.confidence}/10</span>
-          <span className="text-sm">confidence</span>
+          <span className="text-lg font-semibold">{belief.clarity}/10</span>
+          <span className="text-sm">clarity</span>
         </div>
 
         {/* Sections */}
@@ -341,7 +341,7 @@ export default function BeliefDetail() {
                     </Badge>
                   </div>
                   <p className="text-sm text-slate-600 mb-2">
-                    Clarity: {ref.confidence_then}/10
+                    Clarity: {ref.clarity_then}/10
                   </p>
                   {ref.note && (
                     <p className="text-slate-700 text-sm">{ref.note}</p>
